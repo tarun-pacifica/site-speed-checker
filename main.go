@@ -285,6 +285,22 @@ func main() {
 	stats := calculateStats(allResults)
 	rankedSites := rankSites(stats)
 
+	fmt.Println("\nSummary of Flashscore sites metrics (sorted by combined rank):")
+	for i, s := range rankedSites {
+		fmt.Printf("%d. %s:\n", i+1, s.URL)
+		fmt.Printf("   Avg Latency: %v, Min: %v, Max: %v\n", s.AvgLatency, s.MinLatency, s.MaxLatency)
+		fmt.Printf("   Avg TTR: %v, Min: %v, Max: %v\n", s.AvgTTR, s.MinTTR, s.MaxTTR)
+		fmt.Printf("   Latency Rank: %d, TTR Rank: %d, Combined Rank: %.2f\n", s.LatencyRank, s.TTRRank, s.CombinedRank)
+		fmt.Printf("   Success: %d, Failures: %d\n", s.SuccessCount, s.FailureCount)
+
+		if i < len(rankedSites)-1 {
+			gap := rankedSites[i+1].CombinedRank - s.CombinedRank
+			percentageDiff := (gap / s.CombinedRank) * 100
+			fmt.Printf("   Gap to next: %.2f (%.2f%%)\n", gap, percentageDiff)
+		}
+		fmt.Println()
+	}
+
 	// Display rankings by Latency
 	fmt.Println("\nRankings by Latency:")
 	sort.Slice(rankedSites, func(i, j int) bool {
@@ -307,22 +323,6 @@ func main() {
 	sort.Slice(rankedSites, func(i, j int) bool {
 		return rankedSites[i].CombinedRank < rankedSites[j].CombinedRank
 	})
-
-	fmt.Println("\nSummary of Flashscore sites metrics (sorted by combined rank):")
-	for i, s := range rankedSites {
-		fmt.Printf("%d. %s:\n", i+1, s.URL)
-		fmt.Printf("   Avg Latency: %v, Min: %v, Max: %v\n", s.AvgLatency, s.MinLatency, s.MaxLatency)
-		fmt.Printf("   Avg TTR: %v, Min: %v, Max: %v\n", s.AvgTTR, s.MinTTR, s.MaxTTR)
-		fmt.Printf("   Latency Rank: %d, TTR Rank: %d, Combined Rank: %.2f\n", s.LatencyRank, s.TTRRank, s.CombinedRank)
-		fmt.Printf("   Success: %d, Failures: %d\n", s.SuccessCount, s.FailureCount)
-
-		if i < len(rankedSites)-1 {
-			gap := rankedSites[i+1].CombinedRank - s.CombinedRank
-			percentageDiff := (gap / s.CombinedRank) * 100
-			fmt.Printf("   Gap to next: %.2f (%.2f%%)\n", gap, percentageDiff)
-		}
-		fmt.Println()
-	}
 
 	if len(rankedSites) >= 2 {
 		first := rankedSites[0]
